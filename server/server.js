@@ -7,14 +7,34 @@ const path = require('path')
 const app = express()
 
 // Enable CORS with specific options
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://mini-excalidraw.vercel.app',  // Add your Vercel frontend URL here
+  'https://mini-excalidraw-client.vercel.app'  // Common Vercel URL pattern
+];
+
 const corsOptions = {
-  origin: 'http://localhost:3000', // Allow requests from the frontend
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      console.warn(`CORS blocked: ${origin}`);
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
 app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
 app.use(bodyParser.json());
 
 // Log all requests
