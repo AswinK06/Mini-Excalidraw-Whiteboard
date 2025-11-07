@@ -292,6 +292,10 @@ app.delete('/api/shapes/:id', (req,res)=> {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+app.get('/', (req, res) => {
+  res.send('🧩 Mini Excalidraw API is running successfully on Render!');
+});
+
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, ()=> console.log('Server running on port', PORT))
